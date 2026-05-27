@@ -7,12 +7,17 @@
     <style>
         body { background-color: #000; color: #fff; font-family: monospace; padding: 20px; }
         #screen_container { border: 2px solid #22c55e; display: inline-block; }
+        /* キーボードを開くための見えない入力エリアのスタイル */
+        #hidden-input { position: absolute; opacity: 0; pointer-events: none; }
+        /* ボタンの見た目 */
+        .btn { background: #22c55e; color: #000; border: none; padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-bottom: 10px; font-size: 16px; }
     </style>
 </head>
 <body>
 
     <h2>Google Sites Linux Emulator</h2>
-    <p>起動まで10〜20秒ほどかかります。文字が出たらキーボードで操作できます。</p>
+    <button class="btn" onclick="openKeyboard()">⌨️ キーボードを開く</button>
+    <input type="text" id="hidden-input">
 
     <div id="screen_container">
         <div style="white-space: pre; font-family: Courier, monospace; line-height: 14px"></div>
@@ -20,21 +25,33 @@
     </div>
 
     <script>
+        var emulator;
         window.onload = function() {
-            // v86エミュレータの設定
-            var emulator = new V86Starter({
+            emulator = new V86Starter({
                 wasm_path: "https://copy.sh/v86/build/v86.wasm",
-                memory_size: 32 * 1024 * 1024, // メモリ32MB
+                memory_size: 32 * 1024 * 1024,
                 vga_as_text_mode: true,
-                
-                // Alpine Linux（超軽量OS）のデータをネット経由で読み込む
                 bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
                 vga_bios: { url: "https://copy.sh/v86/bios/vgabios.bin" },
-                cdrom: { url: "https://copy.sh/v86/images/alpine316.iso" }, // LinuxのISOファイル
-                
+                cdrom: { url: "https://copy.sh/v86/images/alpine316.iso" },
                 autostart: true
             });
+
+            // 見えない入力エリアに入力された文字をLinuxに送る仕組み
+            var hiddenInput = document.getElementById("hidden-input");
+            hiddenInput.addEventListener("input", function(e) {
+                for (var i = 0; i < e.target.value.length; i++) {
+                    emulator.serial0_send(e.target.value.charCodeAt(i));
+                }
+                e.target.value = ""; // 中身をリセット
+            });
         };
+
+        // ボタンを押したときにキーボードを強制的に出す関数
+        function openKeyboard() {
+            var input = document.getElementById("hidden-input");
+            input.focus();
+        }
     </script>
 
 </body>
