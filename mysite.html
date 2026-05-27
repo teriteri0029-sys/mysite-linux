@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Googleサイト内 Linux環境</title>
+    <script src="https://copy.sh/v86/build/libv86.js"></script>
+    <style>
+        body { background-color: #000; color: #fff; font-family: monospace; padding: 20px; }
+        #screen_container { border: 2px solid #22c55e; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <h2>Google Sites Linux Emulator</h2>
+    <p>起動まで10〜20秒ほどかかります。文字が出たらキーボードで操作できます。</p>
+
+    <div id="screen_container">
+        <div style="white-space: pre; font-family: Courier, monospace; line-height: 14px"></div>
+        <canvas style="display:none"></canvas>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // v86エミュレータの設定
+            var emulator = new V86Starter({
+                wasm_path: "https://copy.sh/v86/build/v86.wasm",
+                memory_size: 32 * 1024 * 1024, // メモリ32MB
+                vga_as_text_mode: true,
+                
+                // Alpine Linux（超軽量OS）のデータをネット経由で読み込む
+                bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
+                vga_bios: { url: "https://copy.sh/v86/bios/vgabios.bin" },
+                cdrom: { url: "https://copy.sh/v86/images/alpine316.iso" }, // LinuxのISOファイル
+                
+                autostart: true
+            });
+        };
+    </script>
+
+</body>
+</html>
+
