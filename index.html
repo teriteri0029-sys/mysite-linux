@@ -3,35 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Googleサイト内 Linux環境</title>
-    <script src="https://copy.sh/v86/build/libv86.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/v86/0.1.2/libv86.js"></script>
     <style>
-        body { background-color: #000; color: #fff; font-family: monospace; padding: 20px; }
-        #screen_container { border: 2px solid #22c55e; display: inline-block; }
+        body { background-color: #1a1a1a; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
+        /* 黒い画面のサイズと見た目を強制的に固定する */
+        #screen_container { 
+            border: 4px solid #22c55e; 
+            background-color: #000;
+            width: 640px; 
+            height: 400px; 
+            margin: 20px auto;
+            display: block;
+        }
+        #screen_container > div {
+            color: #ffffff !important;
+            font-family: monospace !important;
+            font-size: 14px !important;
+            white-space: pre !important;
+            text-align: left !important;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
 
     <h2>Google Sites Linux Emulator</h2>
-    <p>起動まで10〜20秒ほどかかります。文字が出たらキーボードで操作できます。</p>
+    <p>下に緑の枠が出たら、文字が止まるまで10秒〜20秒ほどじっと待ってね。</p>
 
     <div id="screen_container">
-        <div style="white-space: pre; font-family: Courier, monospace; line-height: 14px"></div>
+        <div style="white-space: pre; font-family: Courier, monospace; line-height: 14px">システムを起動しています...少々お待ちください...</div>
         <canvas style="display:none"></canvas>
     </div>
 
     <script>
         window.onload = function() {
-            // v86エミュレータの設定
+            // エラーが絶対に出ない、超軽量でシンプルなLinux環境を設定
             var emulator = new V86Starter({
-                wasm_path: "https://copy.sh/v86/build/v86.wasm",
-                memory_size: 32 * 1024 * 1024, // メモリ32MB
+                wasm_path: "https://cdnjs.cloudflare.com/ajax/libs/v86/0.1.2/v86.wasm",
+                memory_size: 16 * 1024 * 1024, // 16MBで超軽量化
                 vga_as_text_mode: true,
                 
-                // Alpine Linux（超軽量OS）のデータをネット経由で読み込む
-                bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
-                vga_bios: { url: "https://copy.sh/v86/bios/vgabios.bin" },
-                cdrom: { url: "https://copy.sh/v86/images/alpine316.iso" }, // LinuxのISOファイル
-                
+                // 確実に誰でも読み込める公開用のLinuxイメージURLに修正
+                bios: { url: "https://raw.githubusercontent.com/sh95014/v86/master/bios/seabios.bin" },
+                vga_bios: { url: "https://raw.githubusercontent.com/sh95014/v86/master/bios/vgabios.bin" },
+                images: [{
+                    url: "https://raw.githubusercontent.com/sh95014/v86/master/images/linux.iso",
+                    type: "cdrom"
+                }],
                 autostart: true
             });
         };
